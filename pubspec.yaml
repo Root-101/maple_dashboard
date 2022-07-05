@@ -21,6 +21,10 @@ dependencies:
   animations: ^2.0.2
   flutter_animator: ^3.2.2
 
+  #Responsive & Adaptive
+  #TODO: upgrade responsive_framework
+  responsive_framework: ^0.1.9
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

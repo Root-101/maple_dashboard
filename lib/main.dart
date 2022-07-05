@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_animator/flutter_animator.dart';
 import 'package:get/get.dart';
+import 'package:responsive_framework/responsive_framework.dart';
 
 import 'maple_exporter.dart';
 
@@ -27,7 +28,7 @@ class Init {
   Future initialize() async {
     //await BrainUIModule.init();
     //await AppInfo.instance.initialize();
-    await Future.delayed(const Duration(seconds: 3));
+    //await Future.delayed(const Duration(seconds: 3));
 
     //elimina el splash screen cuando termina de cargar. Actualizar a Flutter 3
     //FlutterNativeSplash.remove();
@@ -57,7 +58,9 @@ class SplashScreen extends StatelessWidget {
         } else {
           //loading body
           return Container(
-            child: CircularProgressIndicator(),
+            child: Center(
+              child: CircularProgressIndicator(),
+            ),
           );
         }
       },
@@ -71,6 +74,25 @@ class MapleMaterialApp extends StatelessWidget {
     return GetMaterialApp(
       title: MapleConfig.MAPLE_NAME,
       debugShowCheckedModeBanner: true,
+      //--------------------- <RESPONSIVE> -----------------------------------
+      builder: (context, child) => ResponsiveWrapper.builder(
+        child,
+        maxWidth: 1200,
+        minWidth: 480,
+        defaultScale: true,
+        breakpoints: [
+          ResponsiveBreakpoint.resize(450, name: MOBILE),
+          ResponsiveBreakpoint.autoScale(800, name: MOBILE),
+          ResponsiveBreakpoint.autoScale(800, name: TABLET),
+          ResponsiveBreakpoint.autoScale(1000, name: TABLET),
+          ResponsiveBreakpoint.resize(1200, name: DESKTOP),
+          ResponsiveBreakpoint.autoScale(2460, name: "4K"),
+        ],
+        background: Container(
+          color: Colors.white,
+        ),
+      ),
+      //--------------------- </RESPONSIVE> -----------------------------------
       //--------------------- <THEAMING> -----------------------------------
       theme: _buildTheme(),
       //--------------------- </THEAMING> -----------------------------------
