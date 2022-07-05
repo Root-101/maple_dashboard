@@ -1,115 +1,183 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_animator/flutter_animator.dart';
+import 'package:get/get.dart';
 
+import 'maple_exporter.dart';
+
+/**
+ * Corre la app
+ */
 void main() {
-  runApp(const MyApp());
+  //mantiene el splash screen puesto en lo que la app carga. Actualizar a Flutter 3
+  WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
+  //FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
+
+  runApp(SplashScreen());
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
+/**
+ * Clase auxiliar para cargar los modulos
+ */
+class Init {
+  Init._();
 
-  // This widget is the root of your application.
+  static final instance = Init._();
+
+  Future initialize() async {
+    //await BrainUIModule.init();
+    //await AppInfo.instance.initialize();
+    await Future.delayed(const Duration(seconds: 3));
+
+    //elimina el splash screen cuando termina de cargar. Actualizar a Flutter 3
+    //FlutterNativeSplash.remove();
+  }
+}
+
+/**
+ * 'Supuestamente' un Splash Screen en lo que cargar la inicializacion.
+ * No deberia salir nunca xq se opaca con el splas screen nativo.
+ */
+class SplashScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // Try running your application with "flutter run". You'll see the
-        // application has a blue toolbar. Then, without quitting the app, try
-        // changing the primarySwatch below to Colors.green and then invoke
-        // "hot reload" (press "r" in the console where you ran "flutter run",
-        // or simply save your changes to "hot reload" in a Flutter IDE).
-        // Notice that the counter didn't reset back to zero; the application
-        // is not restarted.
-        primarySwatch: Colors.blue,
-      ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+    //aqui y no en el main por un posible bug en flutter, info at https://stackoverflow.com/questions/49418332/flutter-how-to-prevent-device-orientation-changes-and-force-portrait
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.portraitDown,
+    ]);
+
+    return FutureBuilder(
+      future: Init.instance.initialize(),
+      builder: (context, AsyncSnapshot snapshot) {
+        if (snapshot.connectionState == ConnectionState.done) {
+          return FadeIn(
+            child: MapleMaterialApp(),
+          );
+        } else {
+          //loading body
+          return Container(
+            child: CircularProgressIndicator(),
+          );
+        }
+      },
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({Key? key, required this.title}) : super(key: key);
-
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
-
-  final String title;
-
-  @override
-  State<MyHomePage> createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
-
-  void _incrementCounter() {
-    setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
-    });
-  }
-
+class MapleMaterialApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
-    return Scaffold(
-      appBar: AppBar(
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        title: Text(widget.title),
+    return GetMaterialApp(
+      title: MapleConfig.MAPLE_NAME,
+      debugShowCheckedModeBanner: true,
+      //--------------------- <THEAMING> -----------------------------------
+      theme: _buildTheme(),
+      //--------------------- </THEAMING> -----------------------------------
+      //--------------------- <PAGINATION> -----------------------------------
+      initialRoute: DashboardScreen.ROUTE_NAME,
+      getPages: [
+        //agregar la lista dinamica por los modulos
+        GetPage(
+          name: DashboardScreen.ROUTE_NAME,
+          page: () => DashboardScreen(),
+          transition: Transition.fadeIn,
+        ),
+      ],
+      unknownRoute: GetPage(
+        name: UnknownRouteScreen.ROUTE_NAME,
+        page: () => UnknownRouteScreen(),
       ),
-      body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
-        child: Column(
-          // Column is also a layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Invoke "debug painting" (press "p" in the console, choose the
-          // "Toggle Debug Paint" action from the Flutter Inspector in Android
-          // Studio, or the "Toggle Debug Paint" command in Visual Studio Code)
-          // to see the wireframe for each widget.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text(
-              'You have pushed the button this many times:',
+      //--------------------- </PAGINATION> -----------------------------------
+    );
+  }
+
+  ThemeData _buildTheme() {
+    const String FONT_FAMILY_SLAB = "RobotoSlab";
+
+    return ThemeData(
+      visualDensity: VisualDensity.adaptivePlatformDensity,
+
+      // Define the default brightness and colors.
+      colorScheme: ColorScheme.dark(
+        brightness: Brightness.dark,
+        primary: Color(0xff00a4db),
+        secondary: Color(0xff002edb),
+      ),
+
+      // Define the default font family.
+      fontFamily: FONT_FAMILY_SLAB,
+
+      // Define the default `TextTheme`. Use this to specify the default
+      // text styling for headlines, titles, bodies of text, and more.
+      textTheme: const TextTheme(
+        //utilizado para el texto principal del juego
+        headline1: TextStyle(
+          fontSize: 90,
+          color: Color(0xff2a3762),
+          shadows: [
+            Shadow(
+              color: Colors.blue,
+              blurRadius: 10.0,
+              offset: Offset(3.0, 3.0),
             ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headline4,
+            Shadow(
+              color: Colors.red,
+              blurRadius: 10.0,
+              offset: Offset(-3.0, 3.0),
             ),
           ],
         ),
+        //utilizado para:
+        // - el cargando
+        // - los carteles de win/loose
+        headline4: const TextStyle(
+          fontWeight: FontWeight.bold,
+          fontSize: 70,
+        ),
+        //utilizado para:
+        // - el nombre de los modulos
+        headline5: const TextStyle(
+          fontWeight: FontWeight.bold,
+          fontSize: 33,
+        ),
+        //utilizado para :
+        // - el tile de la seleccion
+        headline6: const TextStyle(
+          fontWeight: FontWeight.normal,
+          fontSize: 30,
+        ),
+        //utilizado para:
+        // - el header del tutorial
+        // - la letra inicial en el trivia
+        subtitle1: TextStyle(
+          fontSize: 35.0,
+          fontWeight: FontWeight.bold,
+        ),
+        //utilizado para:
+        // - los header de los subniveles
+        // - Los badges de los modulos en los botones iniciales
+        // - los card con las letras en el ahorcado
+        // - La pregunta en el trivia
+        // - las respuestas en el trivia
+        // - el texto en el appbar de cada modulo(sale todo por tools)
+        // - el contador de estrellas de cada nivel(5 / 10 *)
+        subtitle2: TextStyle(
+          fontSize: 25.0,
+          fontWeight: FontWeight.bold,
+        ),
+        //utilizado para:
+        // - el texto del tutorial
+        // - los segundos restantes en el contador de trivia
+        bodyText1: TextStyle(
+          fontSize: 20.0,
+        ),
+        //utilizado para:
+        // - el texto de los subniveles
+        bodyText2: TextStyle(
+          fontSize: 15.0,
+        ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
 }
