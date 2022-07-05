@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 
-class UnknownRouteScreen extends StatelessWidget {
+class MapleUnknownRouteScreen extends StatelessWidget {
   static const ROUTE_NAME = "/unknown-route-screen";
 
   final String unknownRoute;
 
-  const UnknownRouteScreen({Key? key, this.unknownRoute = "unknown"})
+  const MapleUnknownRouteScreen({Key? key, this.unknownRoute = "unknown"})
       : super(key: key);
 
   @override

@@ -97,18 +97,18 @@ class MapleMaterialApp extends StatelessWidget {
       theme: _buildTheme(),
       //--------------------- </THEAMING> -----------------------------------
       //--------------------- <PAGINATION> -----------------------------------
-      initialRoute: DashboardScreen.ROUTE_NAME,
+      initialRoute: MapleDashboardScreen.ROUTE_NAME,
       getPages: [
         //agregar la lista dinamica por los modulos
         GetPage(
-          name: DashboardScreen.ROUTE_NAME,
-          page: () => DashboardScreen(),
+          name: MapleDashboardScreen.ROUTE_NAME,
+          page: () => MapleDashboardScreen(),
           transition: Transition.fadeIn,
         ),
       ],
       unknownRoute: GetPage(
-        name: UnknownRouteScreen.ROUTE_NAME,
-        page: () => UnknownRouteScreen(),
+        name: MapleUnknownRouteScreen.ROUTE_NAME,
+        page: () => MapleUnknownRouteScreen(),
       ),
       //--------------------- </PAGINATION> -----------------------------------
     );

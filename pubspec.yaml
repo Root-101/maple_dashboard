@@ -50,6 +50,10 @@ flutter_app_name:
 flutter:
   uses-material-design: true
 
+  assets:
+    - assets/app_icon.png
+
+
   fonts:
     - family: RobotoSlab
       fonts:
