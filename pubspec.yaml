@@ -15,6 +15,8 @@ dependencies:
 
   # Architecture & Management
   get: ^4.6.5
+  clean_core:
+    path: ../../clean-core-flutter
 
   #UI & UX
   sidebarx: ^0.6.0
