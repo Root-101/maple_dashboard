@@ -12,7 +12,7 @@ class MapleDashboardScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       key: _scaffoldKey,
-      drawer: MapleDrawer(),
+      drawer: MapleDrawer.instance,
       appBar: AppBar(
         title: Text("Dashboard"),
       ),
