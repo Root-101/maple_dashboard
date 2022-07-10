@@ -1,16 +1,22 @@
 import 'package:flutter/material.dart';
+import 'package:maple_dashboard/src/ui/b_drawer/maple_drawer.dart';
 
 class NotesHomepage extends StatelessWidget {
-  static const ROUTE_NAME = "/notes-homepage";
+  static final String ROUTE_NAME = "/notes-homepage";
+  final String title;
 
-  const NotesHomepage({Key? key}) : super(key: key);
+  const NotesHomepage({
+    Key? key,
+    required this.title,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      drawer: MapleDrawer.instance,
       appBar: AppBar(
         title: Text(
-          "Notes title",
+          title,
         ),
       ),
       body: Container(
