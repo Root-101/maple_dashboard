@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_animator/flutter_animator.dart';
 import 'package:get/get.dart';
+import 'package:maple_dashboard/notes/notes_app_module.dart';
 import 'package:responsive_framework/responsive_framework.dart';
 
 import 'maple_exporter.dart';
@@ -26,6 +27,7 @@ class Init {
   static final instance = Init._();
 
   Future initialize() async {
+    NoteAppModule.init();
     //await BrainUIModule.init();
     //await AppInfo.instance.initialize();
     //await Future.delayed(const Duration(seconds: 3));
@@ -103,7 +105,7 @@ class MapleMaterialApp extends StatelessWidget {
         GetPage(
           name: MapleDashboardScreen.ROUTE_NAME,
           page: () => MapleDashboardScreen(),
-          transition: Transition.fadeIn,
+          transition: Transition.rightToLeft,
         ),
       ],
       unknownRoute: GetPage(
