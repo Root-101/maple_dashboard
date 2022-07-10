@@ -1,15 +1,91 @@
+import 'package:clean_core/clean_core.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:maple_dashboard/maple_exporter.dart';
 import 'package:sidebarx/sidebarx.dart';
+import 'package:tuple/tuple.dart';
 
 class MapleDrawer extends StatelessWidget {
-  final _controller = SidebarXController(selectedIndex: 0, extended: true);
+  final _controller = SidebarXController(selectedIndex: -1, extended: true);
 
-  MapleDrawer({Key? key}) : super(key: key);
+  ///relacion indice/pagina, necesario para los indices del SidebarXController
+  late final List<Tuple2<int, AppMainModule>> _list;
+
+  ///singleton para si se usa en varios lugares mantenda la misma instancia
+  MapleDrawer._() {
+    //mapeo indice/pagina de todos los `mainModules`
+    //primer indice en cero
+    int index = 0;
+    //mapeo la lista de modulos a su correspondiente indice
+    _list = AppModuleRegister.mainModules()
+        .map(
+          (e) => Tuple2(index++, e), //aumento el indice en cada iteracion
+        )
+        .toList();
+  }
+
+  static final instance = MapleDrawer._();
 
   @override
   Widget build(BuildContext context) {
     return SidebarX(
       controller: _controller,
+      items: [
+        ..._list.map(
+          (module) => SidebarXItem(
+            icon: module.item2.moduleIcon,
+            label: module.item2.moduleName,
+            onTap: () {
+              ///para cerrar el drawer
+              Get.back();
+
+              //solucion 1
+              /*Navigator.pushAndRemoveUntil(
+                    context,
+                    MaterialPageRoute(
+                        builder: (BuildContext context) =>
+                            module.moduleHomePage),
+                    (route) => route.isFirst);*/
+
+              //solucion 2
+              /*navigator!.popUntil((route) => route.isFirst);
+                ///navegar hacia la proxima pagina
+                Get.to(
+                  module.moduleHomePage,
+
+                  ///quitado el preventDuplicates para si hay en un mismo modulo varios items que sean del mismo tipo pero tal vez con parametros diferentes.);
+                  preventDuplicates: false,
+                  transition: Transition.rightToLeft,
+                );*/
+
+              //solucion 3
+              if (_controller.selectedIndex != module.item1) {
+                _controller.selectIndex(module.item1);
+
+                Get.offUntil(
+                  GetPageRoute(
+                    page: () => module.item2.moduleHomePage,
+                    transition: Transition.rightToLeft,
+                  ),
+                  (route) => route.isFirst,
+                );
+              }
+            },
+          ),
+        ),
+        const SidebarXItem(
+          icon: Icons.search,
+          label: 'Search',
+        ),
+        const SidebarXItem(
+          icon: Icons.people,
+          label: 'People',
+        ),
+        const SidebarXItem(
+          icon: Icons.favorite,
+          label: 'Favorite',
+        ),
+      ],
       theme: SidebarXTheme(
         margin: const EdgeInsets.all(10),
         decoration: BoxDecoration(
@@ -50,39 +126,38 @@ class MapleDrawer extends StatelessWidget {
         ),
         margin: EdgeInsets.only(right: 10),
       ),
-      footerDivider: divider,
-      headerBuilder: (context, extended) {
+      //footerDivider: divider,
+      footerBuilder: (context, extended) {
         return SafeArea(
-          child: SizedBox(
+          child: Container(
             height: 100,
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Image.asset('assets/app_icon.png'),
+            color: Colors.pink,
+          ),
+        );
+      },
+      headerBuilder: (context, extended) {
+        return GestureDetector(
+          onTap: () {
+            //cierra el drawer
+            Get.back();
+            if (_controller.selectedIndex != -1) {
+              //seteo el index a -1, deselecciono all
+              _controller.selectIndex(-1);
+              //push por named porque se declara como page global al principo
+              Get.offAllNamed(MapleDashboardScreen.ROUTE_NAME);
+            }
+          },
+          child: SafeArea(
+            child: SizedBox(
+              height: Get.height / 6.5,
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Image.asset('assets/app_icon.png'),
+              ),
             ),
           ),
         );
       },
-      items: [
-        SidebarXItem(
-          icon: Icons.home,
-          label: 'Home',
-          onTap: () {
-            debugPrint('Hello');
-          },
-        ),
-        const SidebarXItem(
-          icon: Icons.search,
-          label: 'Search',
-        ),
-        const SidebarXItem(
-          icon: Icons.people,
-          label: 'People',
-        ),
-        const SidebarXItem(
-          icon: Icons.favorite,
-          label: 'Favorite',
-        ),
-      ],
     );
   }
 }
