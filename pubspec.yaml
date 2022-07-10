@@ -27,6 +27,9 @@ dependencies:
   #TODO: upgrade responsive_framework
   responsive_framework: ^0.1.9
 
+  #Utils
+  tuple: ^2.0.0
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
