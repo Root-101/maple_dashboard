@@ -101,10 +101,14 @@ class MapleMaterialApp extends StatelessWidget {
       //--------------------- <PAGINATION> -----------------------------------
       initialRoute: MapleDashboardScreen.ROUTE_NAME,
       getPages: [
-        //agregar la lista dinamica por los modulos
         GetPage(
           name: MapleDashboardScreen.ROUTE_NAME,
           page: () => MapleDashboardScreen(),
+          transition: Transition.rightToLeft,
+        ),
+        GetPage(
+          name: MapleUIUtilsScreen.ROUTE_NAME,
+          page: () => MapleUIUtilsScreen(),
           transition: Transition.rightToLeft,
         ),
       ],

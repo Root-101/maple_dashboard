@@ -22,6 +22,17 @@ class MapleDrawer extends StatelessWidget {
           (e) => Tuple2(index++, e), //aumento el indice en cada iteracion
         )
         .toList();
+    //agrego al final de la lista los utiles
+    _list.add(
+      Tuple2(
+        index++,
+        AppMainModule(
+          moduleName: "Utiles",
+          moduleHomePage: MapleUIUtilsScreen(),
+          moduleIcon: Icons.build,
+        ),
+      ),
+    );
   }
 
   static final instance = MapleDrawer._();
@@ -36,32 +47,15 @@ class MapleDrawer extends StatelessWidget {
             icon: module.item2.moduleIcon,
             label: module.item2.moduleName,
             onTap: () {
-              ///para cerrar el drawer
+              //para cerrar el drawer
               Get.back();
 
-              //solucion 1
-              /*Navigator.pushAndRemoveUntil(
-                    context,
-                    MaterialPageRoute(
-                        builder: (BuildContext context) =>
-                            module.moduleHomePage),
-                    (route) => route.isFirst);*/
-
-              //solucion 2
-              /*navigator!.popUntil((route) => route.isFirst);
-                ///navegar hacia la proxima pagina
-                Get.to(
-                  module.moduleHomePage,
-
-                  ///quitado el preventDuplicates para si hay en un mismo modulo varios items que sean del mismo tipo pero tal vez con parametros diferentes.);
-                  preventDuplicates: false,
-                  transition: Transition.rightToLeft,
-                );*/
-
-              //solucion 3
+              //solo navego si es para una pagina nueva
               if (_controller.selectedIndex != module.item1) {
+                //marco el indice
                 _controller.selectIndex(module.item1);
 
+                //elimino all menos la primera pagina y pongo la nueva
                 Get.offUntil(
                   GetPageRoute(
                     page: () => module.item2.moduleHomePage,
